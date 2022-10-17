@@ -62,7 +62,7 @@ const HomeScreen = () => {
       });
   }
   const deleteUserItems = (id) => {
-    fetch('http://' + config.serverIp + '/api/user/login', {
+    fetch('http://'+ config.serverIp +'/api/user/list/delete', {
       method: 'POST',
       body: JSON.stringify({
         'userEmail': user,
