@@ -11,6 +11,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {config} from '../../secret'
+
 const { height, width: SCREEN_WIDTH } = Dimensions.get("window");
 const HomeScreen = () => {
   const [foods, setFoods] = useState([]);
@@ -31,7 +33,7 @@ const HomeScreen = () => {
     });
   }
   const getUserItems = async () => {
-    fetch('http://' + config.serverIp + '/api/user/login', {
+    fetch('http://' + config.serverIp + '/api/user/list', {
       method: 'POST',
       body: JSON.stringify({
         'userEmail': user

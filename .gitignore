@@ -105,3 +105,4 @@ dist
 
 #server IP
 secret.js
+config.py

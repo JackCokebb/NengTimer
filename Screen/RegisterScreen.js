@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 
 import Loader from './Components/Loader';
+import {config} from '../secret.js'
 
 const RegisterScreen = (props) => {
   const [userName, setUserName] = useState('');
@@ -76,7 +77,7 @@ const RegisterScreen = (props) => {
     // }
     // formBody = formBody.join('&');
     console.log("fetching start");
-    fetch('http://' + config.serverIp + '/api/user/login', {
+    fetch('http://' + config.serverIp + '/api/user/register', {
       method: 'POST',
       body: JSON.stringify({
         'userName': userName,

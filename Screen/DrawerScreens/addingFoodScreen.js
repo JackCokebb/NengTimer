@@ -20,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../Components/Loader';
 import { Camera } from 'expo-camera';
 import dateFormat, { masks } from "dateformat";
+import * as FileSystem from 'expo-file-system';
+import {config} from '../../secret'
 
 
 const { height, width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -37,6 +39,7 @@ const addingFoodScreen = ({ navigation }) => {
     const [hasGalleryPermission, setHasGalleryPermission] = useState(false);
     const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
     const [capturedImage, setCapturedImage] = useState(null);
+    const [imageBase64, setImageBase64] = useState("");
     const [previewVisible, setPreviewVisible] = useState(false);
     const [blob, setBlob] = useState();
 
@@ -79,7 +82,7 @@ const addingFoodScreen = ({ navigation }) => {
         // }
         // formBody = formBody.join('&');
 
-        fetch('http://' + config.serverIp + '/api/user/login', {
+        fetch('http://' + config.serverIp + '/api/user/list/add', {
             method: 'POST',
             body: JSON.stringify({
                 'userEmail': user,
@@ -154,12 +157,18 @@ const addingFoodScreen = ({ navigation }) => {
         }
     }
     const takePicture = async () => {
-        const photo = await camera.takePictureAsync()
-        console.log(photo)
+        const photo = await camera.takePictureAsync(options={base64:true,quality:0});
+        //const {base64} = await camera.takePictureAsync(options={base64:true,quality:0});
+        console.log("base64 len" + photo.base64.length)
+        var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+        console.log(base64regex.test("U29tZVN0cmluZ09idmlvdXNseU5vdEJhc2U2NEVuY29kZWQ="));
+        console.log("isBase64 ? = " + base64regex.test(photo.base64));
+        console.log(photo.uri)
         setPreviewVisible(true)
         
         //save captured photo to state
         setCapturedImage(photo)
+        setImageBase64(photo.base64)
         
     }
     const retakePicture = () => {
@@ -169,23 +178,39 @@ const addingFoodScreen = ({ navigation }) => {
     }
     const savePhoto = () => {
         setStartCamera(false)
-        predictPicture();
+        //console.log("saved pic uri = " + capturedImage.uri)
+        //const base64 = FileSystem.readAsStringAsync(capturedImage.uri, { encoding: 'base64' })
+        //setImageBase64(capturedImage)
+        console.log(typeof imageBase64)
+        //fetch((capturedImage.uri).replace("file:///","file:/")).then((res)=>{setBlob(res.blob())});
+        //console.log("blob is : ",blob);
+        predictPicture()
     }
 
     const predictPicture = () =>{
         const current = new Date();
-        fetch((capturedImage.uri).replace("file:///","file:/")).then((res)=>{setBlob(res.blob())});
-        console.log("blob is : ",blob);
+        
         //const blob =  response.blob;
         
 
         setLoading(true);
-        let formData = new FormData();
-        formData.append("file", blob);
+        //console.log("base64-ed image = " + imageBase64)
+        //let formData = new FormData();
+        //formData.append("file", imageBase64);
+        //dconsole.log(typeof imageBase64, JSON.stringify(imageBase64))
+        //console.log("formData : " + formData.get("file"))
 
-        fetch('http://' + config.serverIp + '/api/user/login', {
+        fetch('http://' + config.serverIp + '/api/predict', {
             method: 'POST',
-            body: formData,
+            //body: formData,
+            body: JSON.stringify({
+                'file': imageBase64,
+              }),
+              headers: {
+                //Header Defination
+                Accept: 'application/json, text/plain,',
+                'Content-Type': 'application/json',
+              },
         })
         .then((response) => response.json())
         .then((responseJson) => {
@@ -213,6 +238,9 @@ const addingFoodScreen = ({ navigation }) => {
         //console.log(ok);
 
     }, []);
+    // useEffect(()=>{
+    //     savePhoto();
+    // },[imageBase64,blob])
 
 
     return (
@@ -449,7 +477,7 @@ const styles = StyleSheet.create({
 });
 
 const CameraPreview = ({photo, retakePicture, savePhoto}) => {
-    console.log('photo', photo)
+    //console.log('photo', photo)
     return (
       <View
         style={{
@@ -465,6 +493,7 @@ const CameraPreview = ({photo, retakePicture, savePhoto}) => {
             flex: 1
           }}
         >
+        
           <View
             style={{
               flex: 1,

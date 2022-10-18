@@ -18,6 +18,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Loader from './Components/Loader';
+import {config} from '../secret'
+console.log(config.serverIp)
 
 const LoginScreen = ({ navigation }) => {
   const [userEmail, setUserEmail] = useState('');
