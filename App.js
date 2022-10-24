@@ -16,7 +16,17 @@ import LoginScreen from './Screen/LoginScreen';
 import RegisterScreen from './Screen/RegisterScreen';
 import DrawerNavigatorRoutes from './Screen/DrawerNavigatorRoutes';
 
+import * as Notifications from "expo-notifications";
+
 const Stack = createStackNavigator();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const Auth = () => {
   // Stack Navigator for Login and Sign up Screen

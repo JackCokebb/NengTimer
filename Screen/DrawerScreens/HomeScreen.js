@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {config} from '../../secret'
+import Notification,{foodNotification} from "../../notification.js";
 
 const { height, width: SCREEN_WIDTH } = Dimensions.get("window");
 const HomeScreen = () => {
@@ -32,6 +33,7 @@ const HomeScreen = () => {
       }
     });
   }
+
   const getUserItems = async () => {
     fetch('http://' + config.serverIp + '/api/user/list', {
       method: 'POST',
@@ -63,6 +65,16 @@ const HomeScreen = () => {
         console.error(error);
       });
   }
+
+  const setMessage = () =>{
+    //Notification()
+    foods.forEach((food)=>{
+      const foodName = food.foodName
+      const expDate = new Date(food.expiry_date)
+      foodNotification(expDate, foodName);
+    })
+  }
+
   const deleteUserItems = (id) => {
     fetch('http://'+ config.serverIp +'/api/user/list/delete', {
       method: 'POST',
@@ -95,14 +107,20 @@ const HomeScreen = () => {
         console.error(error);
       });
   }
+
+
   useEffect(() => {
     getUserInfo();
+    //Notification();
     //console.log(ok);
 
   }, []);
   useEffect(() => {
     getUserItems();
   }, [user]);
+  useEffect(()=>{
+   //setMessage()
+  },[foods])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -140,7 +158,11 @@ const HomeScreen = () => {
           contentContainerStyle={styles.weather}
         >
           {
+            
             foods.map((food, index) => {
+              const foodName = food.foodName
+              const expDate = new Date(food.expiry_date)
+              foodNotification(expDate, foodName);/////////////////////////////////////184번줄에 Notif
               return (
                 <View key={index} style={styles.food}>
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
@@ -157,7 +179,9 @@ const HomeScreen = () => {
                 </View>)
             }
             )
+
           }
+          <Notification/>
         </ScrollView>
         <Text
           style={{
@@ -166,7 +190,7 @@ const HomeScreen = () => {
             color: 'grey',
           }}
           onPress={() => getUserItems()}>
-          good? reload?
+          reload?
         </Text>
       </View>
     </SafeAreaView>

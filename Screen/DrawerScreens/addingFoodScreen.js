@@ -1,5 +1,4 @@
-// Example of Splash, Login and Sign Up in React Native
-// https://aboutreact.com/react-native-login-and-signup/
+//design ref from https://aboutreact.com/react-native-login-and-signup/
 //expo-camera ref 
 //https://github.com/hayanisaid/expo-camera-tutorial/blob/master/App.tsx 
 
@@ -22,6 +21,7 @@ import { Camera } from 'expo-camera';
 import dateFormat, { masks } from "dateformat";
 import * as FileSystem from 'expo-file-system';
 import {config} from '../../secret'
+import { set } from 'react-native-reanimated';
 
 
 const { height, width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -41,7 +41,9 @@ const addingFoodScreen = ({ navigation }) => {
     const [capturedImage, setCapturedImage] = useState(null);
     const [imageBase64, setImageBase64] = useState("");
     const [previewVisible, setPreviewVisible] = useState(false);
-    const [blob, setBlob] = useState();
+    const [isPredcit, setIsPredict] = useState(false);
+    const [isOCR, setIsOCR] = useState(false);
+    const [read, setRead] = useState("");
 
 
     const getUserInfo = async () => {
@@ -129,7 +131,7 @@ const addingFoodScreen = ({ navigation }) => {
                 console.error(error);
             });
     };
-    const predictFood =async()=>{
+    const readyCamera= async()=>{
         const { status } = await Camera.requestCameraPermissionsAsync();
         setHasCameraPermission(status === 'granted');
         //const galleryStatus = await ImagePicker.requestCameraRollPermissionAsync();
@@ -156,12 +158,16 @@ const addingFoodScreen = ({ navigation }) => {
             setHasCameraPermission(status === 'granted');
         }
     }
+    const predictFood =()=>{
+        setIsPredict(true);
+        readyCamera();
+    }
     const takePicture = async () => {
         const photo = await camera.takePictureAsync(options={base64:true,quality:0});
         //const {base64} = await camera.takePictureAsync(options={base64:true,quality:0});
         console.log("base64 len" + photo.base64.length)
         var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-        console.log(base64regex.test("U29tZVN0cmluZ09idmlvdXNseU5vdEJhc2U2NEVuY29kZWQ="));
+        //console.log(base64regex.test("U29tZVN0cmluZ09idmlvdXNseU5vdEJhc2U2NEVuY29kZWQ="));
         console.log("isBase64 ? = " + base64regex.test(photo.base64));
         console.log(photo.uri)
         setPreviewVisible(true)
@@ -184,7 +190,8 @@ const addingFoodScreen = ({ navigation }) => {
         console.log(typeof imageBase64)
         //fetch((capturedImage.uri).replace("file:///","file:/")).then((res)=>{setBlob(res.blob())});
         //console.log("blob is : ",blob);
-        predictPicture()
+        if(isPredcit) predictPicture()
+        if(isOCR) readPicture()
     }
 
     const predictPicture = () =>{
@@ -194,6 +201,7 @@ const addingFoodScreen = ({ navigation }) => {
         
 
         setLoading(true);
+        setIsPredict(false);
         //console.log("base64-ed image = " + imageBase64)
         //let formData = new FormData();
         //formData.append("file", imageBase64);
@@ -233,14 +241,73 @@ const addingFoodScreen = ({ navigation }) => {
         });
     }
 
+    const readExpiryDate =()=>{
+        setIsOCR(true);
+        readyCamera();
+    }
+    const readPicture = () =>{
+        setLoading(true)
+        setIsOCR(false)
+        console.log("capturedImage base len = " + capturedImage.base64.length)
+
+        fetch(config.GOOGLE_VISION_REQUEST_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+            requests: [
+            {
+                image: {
+                content: capturedImage.base64,
+                },
+                features: [
+                { type: 'TEXT_DETECTION', maxResults: 5 },
+                ],
+                "imageContext": {
+                    "languageHints": ["en-t-i0-handwrit"]
+                }
+            },
+            ],
+        }),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            //console.log(JSON.stringify(data))
+            //console.log(data.responses[0].fullTextAnnotation.text)
+            setRead(data.responses[0].fullTextAnnotation.text);
+            
+        })
+        .catch((err) => console.log('error : ', err));
+        
+        
+        //console.log(resultFromUri)
+        
+    }
+    const getExpiryDate =()=>{
+        let splited = read.split("\n");
+        
+        
+        setRead(splited.join(" "))
+        splited = read.split(" ");
+        console.log("splited = ", splited)
+        let regex = RegExp(/^(\d{4})?.(0[1-9]|1[012]).(0[1-9]|[12][0-9]|3[01])$/);
+
+        splited.forEach((str)=>{
+            
+            if(regex.test(str)){
+                console.log("str = "+str)
+                setExpiryDate(str);
+            }
+        })
+        setLoading(false)
+    }
+
     useEffect(() => {
         getUserInfo();
         //console.log(ok);
 
     }, []);
-    // useEffect(()=>{
-    //     savePhoto();
-    // },[imageBase64,blob])
+    useEffect(()=>{
+        getExpiryDate();
+    },[read])
 
 
     return (
@@ -377,6 +444,12 @@ const addingFoodScreen = ({ navigation }) => {
                                 underlineColorAndroid="#f000"
                                 returnKeyType="next"
                             />
+                            <TouchableOpacity
+                                style={styles.buttonStyle}
+                                activeOpacity={0.5}
+                                onPress={readExpiryDate}>
+                                <Text style={styles.buttonTextStyle}>Read expiry date</Text>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.SectionStyle}>
                             <TextInput
