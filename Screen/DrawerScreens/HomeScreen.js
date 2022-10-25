@@ -20,6 +20,19 @@ const HomeScreen = () => {
   const [user, setUser] = useState("Loading...");
   const [ok, setOk] = useState(false);
   const [error, setErrortext] = useState("");
+  const [dimension, setDimension] = useState(Dimensions.get('window'));
+  useEffect(() => {
+    const eventListener = ({window, screen}) => {
+      setDimension(window.width);
+      SCREEN_WIDTH = window.width;
+    }
+    Dimensions.addEventListener('change', eventListener);
+    return () => {
+        Dimensions.removeEventListener('change', eventListener);
+    }
+  }, []);
+
+
   const getUserInfo = async () => {
     AsyncStorage.getItem('user_id').then((value) => {
       if (value) {
@@ -130,14 +143,16 @@ const HomeScreen = () => {
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
+            
           }}>
           <Text
             style={{
               fontSize: 20,
               textAlign: 'center',
               marginBottom: 16,
+              fontSize: 50
             }}>
-            {user}
+            {user+"'s refrigerator"}
             {'\n\n'}
 
           </Text>
@@ -155,7 +170,7 @@ const HomeScreen = () => {
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           indicatorStyle="white"
-          contentContainerStyle={styles.weather}
+          contentContainerStyle={styles.foods}
         >
           {
             
@@ -215,28 +230,20 @@ const styles = StyleSheet.create({
     marginRight: 35,
     marginTop: 20,
     marginBottom: 25,
+    paddingHorizontal: 10
+    
   },
   buttonTextStyle: {
     color: '#FFFFFF',
     paddingVertical: 10,
     fontSize: 16,
   },
-  city: {
-    flex: 1.2,
-    alignItems: "center",
-    justifyContent: "center",
-
-  },
-  cityName: {
-    fontSize: 58,
-    fontWeight: "500",
-    color: "white",
-  },
-  weather: {
-
+  foods: {
+    margin: 0,
+    padding: 0,
   },
   food: {
-    width: SCREEN_WIDTH,
+    width: SCREEN_WIDTH * 0.91,
     alignItems: "flex-start",
     paddingHorizontal: 20,
 

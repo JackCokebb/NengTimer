@@ -394,11 +394,22 @@ const addingFoodScreen = ({ navigation }) => {
                 <View>
                     <KeyboardAvoidingView enabled>
                         <View style={{ alignItems: 'center' }}>
-                            <Image
-                                source={require('../../src/maxresdefault.jpg')}
+                            <Text
                                 style={{
-                                    width: '50%',
-                                    height: 100,
+                                fontSize: 20,
+                                color: 'white',
+                                textAlign: 'center',
+                                marginBottom: 0,
+                                fontSize: 50
+                                }}>
+                                {"Add a new food"}
+
+                            </Text>
+                            <Image
+                                source={require('../../src/newFood.png')}
+                                style={{
+                                    //width: '70%',
+                                    height: 130,
                                     resizeMode: 'contain',
                                     margin: 30,
                                 }}
@@ -474,7 +485,7 @@ const addingFoodScreen = ({ navigation }) => {
                             </Text>
                         ) : null}
                         <TouchableOpacity
-                            style={styles.buttonStyle}
+                            style={styles.addButtonStyle}
                             activeOpacity={0.5}
                             onPress={handleSubmitPress}>
                             <Text style={styles.buttonTextStyle}>ADD</Text>
@@ -515,9 +526,23 @@ const styles = StyleSheet.create({
         height: 40,
         alignItems: 'center',
         borderRadius: 30,
+        marginLeft: 10,
+        marginRight: 0,
+        marginTop: 0,
+        marginBottom: 25,
+        paddingHorizontal: 10,
+    },
+    addButtonStyle: {
+        backgroundColor: '#7DE24E',
+        borderWidth: 0,
+        color: '#FFFFFF',
+        borderColor: '#7DE24E',
+        height: 40,
+        alignItems: 'center',
+        borderRadius: 30,
         marginLeft: 35,
         marginRight: 35,
-        marginTop: 20,
+        marginTop: 10,
         marginBottom: 25,
     },
     buttonTextStyle: {

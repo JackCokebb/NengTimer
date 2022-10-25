@@ -69,21 +69,25 @@ export async function foodNotification(expDate, food) {
 async function registerForPushNotificationsAsync() {
     let token;
     if (Constants.isDevice) {
-    const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-    }
-    if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-    }
+    const { status: existingStatus } = await Notifications.getPermissionsAsync()
+    .then(async(existingStatus)=>{
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync()
+        .then((status) => {
+          if (finalStatus !== "granted") {
+            alert("Failed to get push token for push notification!");
+            return;
+          }
+          return status;
+        })
+    }  
+    });
+    
+    
     token = (await Notifications.getExpoPushTokenAsync()).data;
     console.log(token);
     } else {
-    alert("Must use physical device for Push Notifications");
+      alert("Must use physical device for Push Notifications");
     }
 
     if (Platform.OS === "android") {

@@ -2,7 +2,7 @@
 // https://aboutreact.com/react-native-login-and-signup/
  
 // Import React and Component
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {View, Text, Alert, StyleSheet} from 'react-native';
  
 import {
@@ -12,18 +12,36 @@ import {
 } from '@react-navigation/drawer';
  
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
  
 const CustomSidebarMenu = (props) => {
+  const [user, setUser] = useState("Loading...");
+  const getUserName = () =>{
+    AsyncStorage.getItem('user_id').then((value) => {
+      if (value) {
+        //setOk(true);
+        setUser(value);
+      }
+      else {
+        //setOk(false);
+      }
+    });
+  } 
+  useEffect(
+    ()=>{
+      getUserName()
+    },[]
+  )
   return (
     <View style={stylesSidebar.sideMenuContainer}>
       <View style={stylesSidebar.profileHeader}>
         <View style={stylesSidebar.profileHeaderPicCircle}>
           <Text style={{fontSize: 25, color: '#307ecc'}}>
-            {'About React'.charAt(0)}
+            {user.charAt(0)}
           </Text>
         </View>
         <Text style={stylesSidebar.profileHeaderText}>
-          AboutReact
+          {user}
         </Text>
       </View>
       <View style={stylesSidebar.profileHeaderLine} />
@@ -32,7 +50,7 @@ const CustomSidebarMenu = (props) => {
         <DrawerItemList {...props} />
         <DrawerItem
           label={({color}) => 
-            <Text style={{color: '#d8d8d8'}}>
+            <Text style={{color: 'red'}}>
               Logout
             </Text>
           }
@@ -71,13 +89,13 @@ const stylesSidebar = StyleSheet.create({
   sideMenuContainer: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#307ecc',
+    backgroundColor: '#74b1ed',
     paddingTop: 40,
     color: 'white',
   },
   profileHeader: {
     flexDirection: 'row',
-    backgroundColor: '#307ecc',
+    backgroundColor: '#74b1ed',
     padding: 15,
     textAlign: 'center',
   },
