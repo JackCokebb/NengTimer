@@ -152,7 +152,7 @@ const HomeScreen = () => {
               marginBottom: 16,
               fontSize: 50
             }}>
-            {user+"'s refrigerator"}
+            {"my refrigerator"}
             {'\n\n'}
 
           </Text>
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     borderRadius: 30,
-    marginLeft: 35,
+    marginLeft: 10,
     marginRight: 35,
     marginTop: 20,
     marginBottom: 25,

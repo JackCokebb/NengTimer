@@ -35,6 +35,14 @@ def transform_image(infile):
     timg.unsqueeze_(0)
     return timg
 
+def transform_image_web(infile):
+    my_transforms = test_transforms
+    image = Image.open(infile)
+    timg = my_transforms(image)
+    timg = timg.to(device)
+    timg.unsqueeze_(0)
+    return timg
+
 def get_prediction(input_tensor):
     outputs = model(input_tensor)
     _, predictions = torch.max(outputs, 1)
@@ -49,7 +57,7 @@ def index():
         <body>
             <h1>Welcome</h1>
             <h2>Try POSTing to the /predict endpoint with an RGB image attachment</h2>
-            <form action = "http://{config.SERVER_IP}/api/predict" method = "POST" enctype = "multipart/form-data">
+            <form action = "http://{config.SERVER_IP}/web/predict" method = "POST" enctype = "multipart/form-data">
                 <input type = "file" name = "file" />
                 <input type = "submit"/>
             </form>
@@ -60,6 +68,20 @@ def index():
     </html>
     '''
 
+@app.route('/web/predict', methods=['POST'])
+def predict_img_web():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file is not None:
+            input_tensor = transform_image_web(file)
+            predict = get_prediction(input_tensor)
+            predicted_class = classes[predict]
+            extra_date = consumable_date[predicted_class]
+            print(f"file: {predicted_class}")
+            return jsonify({
+                'className': classes[predict],
+                'extraDate' : extra_date
+                            })
 
 @app.route('/api/predict', methods=['POST'])
 def predict_img():

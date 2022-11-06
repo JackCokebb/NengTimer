@@ -102,7 +102,14 @@ const addingFoodScreen = ({ navigation }) => {
             .then((responseJson) => {
                 //Hide Loader
                 setLoading(false);
+
+                //reset data
+                setFoodName("");
+                setExpiryDate("");
+                setFoodQuantity("");
+                setCapturedImage(null);
                 console.log(responseJson);
+
                 // If server response message same as Data Matched
                 if (responseJson.status === 'success') {
                     Alert.alert(
@@ -128,6 +135,7 @@ const addingFoodScreen = ({ navigation }) => {
             .catch((error) => {
                 //Hide Loader
                 setLoading(false);
+                setCapturedImage(null);
                 console.error(error);
             });
     };
@@ -224,6 +232,7 @@ const addingFoodScreen = ({ navigation }) => {
         .then((responseJson) => {
             //Hide Loader
             setLoading(false);
+            setCapturedImage(null);
             console.log(responseJson);
             // If server response message same as Data Matched
             setFoodName(responseJson.className);
@@ -237,6 +246,7 @@ const addingFoodScreen = ({ navigation }) => {
         .catch((error) => {
             //Hide Loader
             setLoading(false);
+            setCapturedImage(null);
             console.error(error);
         });
     }
@@ -293,11 +303,12 @@ const addingFoodScreen = ({ navigation }) => {
         splited.forEach((str)=>{
             
             if(regex.test(str)){
-                console.log("str = "+str)
+                console.log("str = "+str);
                 setExpiryDate(str);
             }
         })
-        setLoading(false)
+        setLoading(false);
+        setCapturedImage(null);
     }
 
     useEffect(() => {
@@ -468,6 +479,7 @@ const addingFoodScreen = ({ navigation }) => {
                                 onChangeText={(foodQuantity) =>
                                     setFoodQuantity(foodQuantity)
                                 }
+                                value={foodQuantity}
                                 placeholder="Enter food quantity" 
                                 placeholderTextColor="#8b9cb5"
                                 keyboardType="default"
