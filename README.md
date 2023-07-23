@@ -36,7 +36,7 @@
 - crawled and refined food images  
 
 ## System Architecture
-<img src="/assets/final_system_arch.png" width=" 200px"   title="final_system_arch" alt="final_system_arch"></img>
+<img src="/assets/final_system_arch.png" width="350px"   title="final_system_arch" alt="final_system_arch"></img>
 
 ## frameworks & tools 
 - React Native
